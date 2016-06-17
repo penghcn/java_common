@@ -1,30 +1,48 @@
-
+package cn.pengh.util;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.List;
 
 public class CurrencyUtil {
-	private static BigDecimal bd0 = new BigDecimal(0);
-	private static BigDecimal bd1 = new BigDecimal(1);
-	private static BigDecimal bd100 = new BigDecimal(100);
+	private static final BigDecimal BD0 = BigDecimal.ZERO;
+	private static final BigDecimal BD1 = BigDecimal.ONE;
+	private static final BigDecimal BD100 = new BigDecimal(100);
+	private static final BigDecimal BD1_NEGATIVE = new BigDecimal(-1);
+	private static final int SCALE = 2;
 	private static final String CURRENCY_FORMAT = "#,#00.00#";
 	
 	//元转分
 	public static BigDecimal yuan2fen(Object money) {
-		BigDecimal bd = new BigDecimal(_getStrMoney(money));
-		return bd.setScale(2,BigDecimal.ROUND_HALF_UP).multiply(bd100);
-	}
-	//分转元
-	public static BigDecimal fen2yuan(Object money) {
-		BigDecimal bd = new BigDecimal(_getStrMoney(money));
-		return bd.divide(bd100,2,BigDecimal.ROUND_HALF_UP);
+		return yuan2fen(money, SCALE);
 	}
 	
-	//元转分
-	public static BigDecimal convert(Object money) {
+	public static BigDecimal yuan2fen(Object money,int SCALE) {
 		BigDecimal bd = new BigDecimal(_getStrMoney(money));
-		return bd.setScale(2,BigDecimal.ROUND_HALF_UP).multiply(bd1);
+		return bd.multiply(BD100).setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+	}
+	//分转元
+	public static BigDecimal fen2yuan(Object money,int SCALE) {
+		BigDecimal bd = new BigDecimal(_getStrMoney(money));
+		return bd.divide(BD100,SCALE,BigDecimal.ROUND_HALF_UP);
+	}
+	public static BigDecimal fen2yuan(Object money) {
+		return fen2yuan(money, SCALE);
+	}
+	
+	
+	public static BigDecimal negative(Object money,int SCALE) {
+		BigDecimal bd = new BigDecimal(_getStrMoney(money));
+		return bd.setScale(SCALE,BigDecimal.ROUND_HALF_UP).multiply(BD1_NEGATIVE);
+	}
+	
+	public static BigDecimal convert(Object money,int SCALE) {
+		BigDecimal bd = new BigDecimal(_getStrMoney(money));
+		return bd.setScale(SCALE,BigDecimal.ROUND_HALF_UP).multiply(BD1);
+	}
+	
+	public static BigDecimal convert(Object money) {
+		return convert(money, SCALE);
 	}
 	
 	private static String _getStrMoney(Object money) {
@@ -44,7 +62,10 @@ public class CurrencyUtil {
 	}
 	public static int yuan2fenInt(Object money) {
 		return yuan2fen(money).intValue();
-	}	
+	}
+	public static String yuan2fenStr(Object money) {
+		return yuan2fen(money).toString();
+	}
 	public static String fen2yuanStr(Object money) {
 		return fen2yuan(money).toString();
 	}
@@ -60,66 +81,216 @@ public class CurrencyUtil {
 	public static String convertStr(Object money) {
 		return convert(money).toString();
 	}
-	
-	//加减法	
-	public static BigDecimal add(Double...ds) {
-    	BigDecimal bigD = bd0;
-		for (int i = 0; i < ds.length; i++) {
-			if (ds[i] != null)
-				bigD = bigD.add(new BigDecimal(Double.toString(ds[i])));
+
+	//加减法		
+	public static <T> BigDecimal add(int SCALE,T...ds) {
+    	BigDecimal bigD = BD0;
+    	if (ds == null) 
+    		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+		for (T t : ds) {
+			if (t != null)
+				bigD = bigD.add(new BigDecimal(_getStrMoney(t)));
 		}
-		//return bigD.divide(new BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP).doubleValue();
-		return bigD.setScale(2,BigDecimal.ROUND_HALF_UP);
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
     }
-	public static BigDecimal add(String...ds) {
-    	BigDecimal bigD = bd0;
-		for (int i = 0; i < ds.length; i++) {
-			if (ds[i] != null)
-				bigD = bigD.add(new BigDecimal(ds[i]));
+	public static BigDecimal add(int SCALE,double...ds) {
+    	BigDecimal bigD = BD0;
+		for (double d : ds) {
+			bigD = bigD.add(new BigDecimal(Double.toString(d)));
 		}
-		//return bigD.divide(new BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP).doubleValue();
-		return bigD.setScale(2,BigDecimal.ROUND_HALF_UP);
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
     }
-	public static BigDecimal add(List<String> ls) {
-		return add(ls.toArray(new String[ls.size()]));
+	public static BigDecimal add(int SCALE,float...ds) {
+    	BigDecimal bigD = BD0;
+		for (float d : ds) {
+			bigD = bigD.add(new BigDecimal(Float.toString(d)));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal add(int SCALE,int...ds) {
+    	BigDecimal bigD = BD0;
+		for (int d : ds) {
+			bigD = bigD.add(new BigDecimal(d));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal add(int SCALE,long...ds) {
+    	BigDecimal bigD = BD0;
+		for (long d : ds) {
+			bigD = bigD.add(new BigDecimal(d));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal add(int SCALE,short...ds) {
+    	BigDecimal bigD = BD0;
+		for (short d : ds) {
+			bigD = bigD.add(new BigDecimal(d));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal add(int SCALE,byte...ds) {
+    	BigDecimal bigD = BD0;
+		for (byte d : ds) {
+			bigD = bigD.add(new BigDecimal(d));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static <T>BigDecimal add(T...ds) {
+    	return add(SCALE, ds);
+    }	
+	public static <T>BigDecimal add(double...ds) {
+    	return add(SCALE, ds);
+    }
+	public static <T>BigDecimal add(float...ds) {
+    	return add(SCALE, ds);
+    }
+	public static BigDecimal add(long...ds) {
+    	return add(SCALE, ds);
+    }
+	public static BigDecimal add(int...ds) {
+    	return add(SCALE,ds);
+    }
+	public static BigDecimal add(short...ds) {    	
+		return add(SCALE,ds);
+    }
+	public static BigDecimal add(byte...ds) {    	
+		return add(SCALE,ds);
+    }
+	public static <T> BigDecimal add(int SCALE,List<T> ls) {
+		return add(SCALE,StringUtil.list2Array(ls));
 	}
-	public static BigDecimal addDouble(List<Double> ls) {
-		return add(ls.toArray(new Double[ls.size()]));
+	public static <T> BigDecimal add(List<T> ls) {
+		return add(SCALE,ls);
 	}
-    //乘法
-	public static BigDecimal multiply(Double... ds) {
-    	BigDecimal bigD = bd1;
-		for (int i = 0; i < ds.length; i++) {
-			if (ds[i] != null)
-				bigD = bigD.multiply(new BigDecimal(Double.toString(ds[i]))); 
-		}
-		//除法
-		//new BigDecimal("100").divide(new BigDecimal("3"), 2, BigDecimal.ROUND_HALF_UP).doubleValue();//2位小数
-		return bigD.setScale(2,BigDecimal.ROUND_HALF_UP);
+		
+	public static BigDecimal add(Object money,Object money2,int SCALE) {	
+		return add(SCALE,new String[]{ _getStrMoney(money), _getStrMoney(money2)});
     }
-	public static BigDecimal multiply(String... ds) {
-    	BigDecimal bigD = bd1;
-		for (int i = 0; i < ds.length; i++) {
-			if (ds[i] != null)
-				bigD = bigD.multiply(new BigDecimal(ds[i])); 
+	public static BigDecimal add(Object money,Object money2) {	
+		return add(money, money2, SCALE);
+    }
+
+    //乘法	
+	public static <T> BigDecimal multiply(int SCALE,T... ds) {
+    	BigDecimal bigD = BD1;		
+		for (T d : ds) {
+			if (d != null)
+				bigD = bigD.multiply(new BigDecimal(_getStrMoney(d)));
 		}
-		//除法
-		//new BigDecimal("100").divide(new BigDecimal("3"), 2, BigDecimal.ROUND_HALF_UP).doubleValue();//2位小数
-		return bigD.setScale(2,BigDecimal.ROUND_HALF_UP);
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
     }
 	
-	public static BigDecimal divide(String mum,String son) {    	
-		//除法
-		return new BigDecimal(son).divide(new BigDecimal(mum), 2, BigDecimal.ROUND_HALF_UP);//2位小数
+	public static BigDecimal multiply(int SCALE,double... ds) {
+    	BigDecimal bigD = BD1;	
+		for (double d : ds) {
+			bigD = bigD.multiply(new BigDecimal(Double.toString(d)));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal multiply(int SCALE,float... ds) {
+    	BigDecimal bigD = BD1;	
+		for (float d : ds) {
+			bigD = bigD.multiply(new BigDecimal(Float.toString(d)));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal multiply(int SCALE,long... ds) {
+    	BigDecimal bigD = BD1;	
+		for (long d : ds) {
+			bigD = bigD.multiply(new BigDecimal(Long.toString(d)));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal multiply(int SCALE,int... ds) {
+    	BigDecimal bigD = BD1;	
+		for (long d : ds) {
+			bigD = bigD.multiply(new BigDecimal(d));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal multiply(int SCALE,short... ds) {
+    	BigDecimal bigD = BD1;	
+		for (short d : ds) {
+			bigD = bigD.multiply(new BigDecimal(d));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+	public static BigDecimal multiply(int SCALE,byte... ds) {
+    	BigDecimal bigD = BD1;	
+		for (byte d : ds) {
+			bigD = bigD.multiply(new BigDecimal(d));
+		}
+		return bigD.setScale(SCALE,BigDecimal.ROUND_HALF_UP);
+    }
+
+	public static<T> BigDecimal multiply(T... ds) {
+    	return multiply(SCALE, ds);
+    }
+	public static BigDecimal multiply(double... ds) {
+    	return multiply(SCALE, ds);
+    }
+	public static BigDecimal multiply(float... ds) {
+    	return multiply(SCALE, ds);
+    }
+	public static BigDecimal multiply(long... ds) {
+    	return multiply(SCALE, ds);
+    }
+	public static BigDecimal multiply(int... ds) {
+		return multiply(SCALE, ds);
+    }
+	public static BigDecimal multiply(short... ds) {
+		return multiply(SCALE, ds);
+    }
+	public static BigDecimal multiply(byte... ds) {
+		return multiply(SCALE, ds);
+    }
+	public static <T> BigDecimal multiply(int SCALE,List<T> ls) {
+		return multiply(SCALE,StringUtil.list2Array(ls));
+	}
+	public static <T> BigDecimal multiply(List<T> ls) {
+		return multiply(SCALE,ls);
+	}
+	public static BigDecimal multiply(Object money,Object money2,int SCALE) {	
+		return multiply(SCALE,new String[]{ _getStrMoney(money), _getStrMoney(money2)});
+    }
+	public static BigDecimal multiply(Object money,Object money2) {	
+		return multiply(money, money2, SCALE);
+    }
+	/**
+	 * son/mum
+	 * @param son
+	 * @param mum
+	 * @return
+	 */
+	public static BigDecimal divide(Object son,Object mum) {    	
+		return divide(son, mum, SCALE);
+    }
+	public static BigDecimal divide(Object son,Object mum,int SCALE) {  
+		String mumStr = _getStrMoney(mum);
+		//分母为0
+		if ("0".equals(mumStr))
+			return BD0.divide(BD1, SCALE, BigDecimal.ROUND_HALF_UP);
+		return new BigDecimal(_getStrMoney(son)).divide(new BigDecimal(mumStr), SCALE, BigDecimal.ROUND_HALF_UP);//2位小数
     }
 	
-	public static String format(double in) {
-		DecimalFormat df = new DecimalFormat(CURRENCY_FORMAT);
-		return df.format(in).toString();
+	public static String rate(Object son,Object mum) { 		
+		return rate(son, mum, SCALE);//2位小数
+    }
+	
+	
+	public static String rate(Object son,Object mum,int SCALE) { 
+		BigDecimal sunBd = new BigDecimal(_getStrMoney(son)).multiply(BD100),mumBd = new BigDecimal(_getStrMoney(mum)) ;
+		if (sunBd.intValue() == 0 || mumBd.intValue() == 0)
+			return BD0.divide(BD1, SCALE, BigDecimal.ROUND_HALF_UP).toString();
+		return sunBd.divide(mumBd, SCALE, BigDecimal.ROUND_HALF_UP).toString();
+    }
+	
+	public static String format(Object money) {
+		return format(money,CURRENCY_FORMAT);
 	}
-	public static String format(String in) {
-		DecimalFormat df = new DecimalFormat(CURRENCY_FORMAT);
-		return df.format(new BigDecimal(in).doubleValue()).toString();
+	public static String format(Object money,String formatReg) {
+		DecimalFormat df = new DecimalFormat(formatReg);
+		return df.format(new BigDecimal(_getStrMoney(money)).doubleValue()).toString().replaceAll("^0(\\d).(\\d+)$", "$1.$2");
 	}
 	public static String bytes2HexString(byte[] b) {  
 	    String ret = "";  
@@ -131,28 +302,5 @@ public class CurrencyUtil {
 	     ret += hex.toUpperCase();  
 	  }  
 	  return ret;  
-	}
-	
-	protected static void test2() {
-		System.out.println(format("22232.9"));
-		System.out.println(fen2yuanWithFormat("6049005"));
-		System.out.println(yuan2fenLong("4343.657"));
-		
-		//注意对比
-		System.out.println(new BigDecimal("4343.655").multiply(bd100).setScale(2, BigDecimal.ROUND_HALF_UP));
-		System.out.println(new BigDecimal("4343.655").multiply(bd100).setScale(2, BigDecimal.ROUND_HALF_UP).longValue());
-		System.out.println(new BigDecimal("4343.655").setScale(2, BigDecimal.ROUND_HALF_UP).multiply(bd100));
-		System.out.println(new BigDecimal("4343.655").setScale(2, BigDecimal.ROUND_HALF_UP).multiply(bd100).longValue());
-	}
-	
-	
-	
-	public static void main(String[] args) {
-		//test2();
-		Double r = 0.0;
-		System.out.println(fen2yuanStr(r));
-		//test22(r);
-		System.out.println(convertStr(r));
-		
 	}
 }
